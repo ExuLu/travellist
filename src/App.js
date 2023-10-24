@@ -9,6 +9,13 @@ import { useState } from 'react';
 function App() {
   const [items, setItems] = useState([]);
 
+  const totalItems = items.reduce((sum, curItem) => sum + curItem.quantity, 0);
+  const packedItems = items.reduce(
+    (acc, curItem) => (curItem.packed ? acc + curItem.quantity : acc),
+    0
+  );
+  const percents = Math.round((packedItems / totalItems) * 100);
+
   function addItem(item) {
     setItems((items) => [...items, item]);
   }
@@ -34,7 +41,11 @@ function App() {
         onDeleteItem={deleteItem}
         onCheck={checkItem}
       />
-      <Stats />
+      <Stats
+        totalItems={totalItems}
+        packedItems={packedItems}
+        percents={percents}
+      />
     </div>
   );
 }
@@ -126,10 +137,13 @@ function Item({ itemObj, onDeleteItem, onCheck }) {
   );
 }
 
-function Stats() {
+function Stats({ totalItems, packedItems, percents }) {
   return (
     <footer className='stats'>
-      <em>🧳 You have 4 items in your list.</em>
+      <em>
+        🧳 You have {totalItems} items on your list, and you already packed{' '}
+        {packedItems} ({percents ? percents : 0}%)
+      </em>
     </footer>
   );
 }
