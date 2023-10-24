@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
-const initialItems = [
-  { id: 1, description: 'Passports', quantity: 2, packed: false },
-  { id: 2, description: 'Socks', quantity: 12, packed: true },
-  { id: 3, description: 'Charger', quantity: 1, packed: false },
-];
+// const initialItems = [
+//   { id: 1, description: 'Passports', quantity: 2, packed: false },
+//   { id: 2, description: 'Socks', quantity: 12, packed: true },
+//   { id: 3, description: 'Charger', quantity: 1, packed: false },
+// ];
 
 function App() {
   const [items, setItems] = useState([]);
@@ -17,11 +17,23 @@ function App() {
     setItems((items) => items.filter((item) => item.id !== id));
   }
 
+  function checkItem(id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
+
   return (
     <div className='app'>
       <Logo />
       <Form onAddItem={addItem} />
-      <PackingList items={items} onDeleteItem={deleteItem} />
+      <PackingList
+        items={items}
+        onDeleteItem={deleteItem}
+        onCheck={checkItem}
+      />
       <Stats />
     </div>
   );
@@ -72,12 +84,17 @@ function Form({ onAddItem }) {
   );
 }
 
-function PackingList({ items, onDeleteItem }) {
+function PackingList({ items, onDeleteItem, onCheck }) {
   return (
     <div className='list'>
       <ul>
         {items.map((item) => (
-          <Item itemObj={item} key={item.id} onDeleteItem={onDeleteItem} />
+          <Item
+            itemObj={item}
+            key={item.id}
+            onDeleteItem={onDeleteItem}
+            onCheck={onCheck}
+          />
         ))}
       </ul>
       <div className='actions'>
@@ -92,11 +109,15 @@ function PackingList({ items, onDeleteItem }) {
   );
 }
 
-function Item({ itemObj, onDeleteItem }) {
+function Item({ itemObj, onDeleteItem, onCheck }) {
   const { quantity, description, packed, id } = itemObj;
   return (
     <li>
-      <input type='checkbox'></input>
+      <input
+        type='checkbox'
+        value={packed}
+        onChange={() => onCheck(id)}
+      ></input>
       <span style={packed ? { textDecoration: 'line-through' } : {}}>
         {quantity} {description}
       </span>
