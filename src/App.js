@@ -9,13 +9,6 @@ import { useState } from 'react';
 function App() {
   const [items, setItems] = useState([]);
 
-  const totalItems = items.reduce((sum, curItem) => sum + curItem.quantity, 0);
-  const packedItems = items.reduce(
-    (acc, curItem) => (curItem.packed ? acc + curItem.quantity : acc),
-    0
-  );
-  const percents = Math.round((packedItems / totalItems) * 100);
-
   function addItem(item) {
     setItems((items) => [...items, item]);
   }
@@ -41,11 +34,7 @@ function App() {
         onDeleteItem={deleteItem}
         onCheck={checkItem}
       />
-      <Stats
-        totalItems={totalItems}
-        packedItems={packedItems}
-        percents={percents}
-      />
+      <Stats items={items} />
     </div>
   );
 }
@@ -110,9 +99,9 @@ function PackingList({ items, onDeleteItem, onCheck }) {
       </ul>
       <div className='actions'>
         <select>
-          <option>Filter by quantity</option>
-          <option></option>
-          <option></option>
+          <option>Sort by input order</option>
+          <option>Sort by description</option>
+          <option>Sort by packed status</option>
         </select>
         <button>Clear list</button>
       </div>
@@ -137,12 +126,28 @@ function Item({ itemObj, onDeleteItem, onCheck }) {
   );
 }
 
-function Stats({ totalItems, packedItems, percents }) {
+function Stats({ items }) {
+  if (!items.length)
+    return (
+      <footer className='stats'>
+        <em>Start adding some items to your packing list 🚀</em>
+      </footer>
+    );
+
+  const totalItems = items.reduce((sum, curItem) => sum + curItem.quantity, 0);
+  const packedItems = items.reduce(
+    (acc, curItem) => (curItem.packed ? acc + curItem.quantity : acc),
+    0
+  );
+  const percents = Math.round((packedItems / totalItems) * 100);
+
   return (
     <footer className='stats'>
       <em>
-        🧳 You have {totalItems} items on your list, and you already packed{' '}
-        {packedItems} ({percents ? percents : 0}%)
+        {percents === 100
+          ? 'You got everything! Ready to go ✈️'
+          : `🧳 You have ${totalItems} items on your list, and you already packed 
+        ${packedItems} (${percents}%)`}
       </em>
     </footer>
   );
