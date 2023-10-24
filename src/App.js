@@ -7,11 +7,21 @@ const initialItems = [
 ];
 
 function App() {
+  const [items, setItems] = useState([]);
+
+  function addItem(item) {
+    setItems((items) => [...items, item]);
+  }
+
+  function deleteItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+
   return (
     <div className='app'>
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItem={addItem} />
+      <PackingList items={items} onDeleteItem={deleteItem} />
       <Stats />
     </div>
   );
@@ -21,24 +31,25 @@ function Logo() {
   return <h1>🏝️ Far Away 🧳</h1>;
 }
 
-function Form() {
+function Form({ onAddItem }) {
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState(1);
 
-  function addItem(e) {
+  function createItem(e) {
     e.preventDefault();
 
     if (!description) return;
 
     const newItem = { description, quantity, packed: false, id: Date.now() };
-    console.log(newItem);
+
+    onAddItem(newItem);
 
     setDescription('');
     setQuantity(1);
   }
 
   return (
-    <form className='add-form' onSubmit={addItem}>
+    <form className='add-form' onSubmit={createItem}>
       <h3>What do you need for your 😍 trip?</h3>
       <select
         value={quantity}
@@ -61,12 +72,12 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({ items, onDeleteItem }) {
   return (
     <div className='list'>
       <ul>
-        {initialItems.map((item) => (
-          <Item itemObj={item} key={item.id} />
+        {items.map((item) => (
+          <Item itemObj={item} key={item.id} onDeleteItem={onDeleteItem} />
         ))}
       </ul>
       <div className='actions'>
@@ -81,15 +92,15 @@ function PackingList() {
   );
 }
 
-function Item({ itemObj }) {
-  const { quantity, description, packed } = itemObj;
+function Item({ itemObj, onDeleteItem }) {
+  const { quantity, description, packed, id } = itemObj;
   return (
     <li>
       <input type='checkbox'></input>
       <span style={packed ? { textDecoration: 'line-through' } : {}}>
         {quantity} {description}
       </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItem(id)}>❌</button>
     </li>
   );
 }
