@@ -1,3 +1,4 @@
+import { clear } from '@testing-library/user-event/dist/clear';
 import { useState } from 'react';
 
 // const initialItems = [
@@ -25,6 +26,13 @@ function App() {
     );
   }
 
+  function clear() {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete all items?'
+    );
+    if (confirmed) setItems([]);
+  }
+
   return (
     <div className='app'>
       <Logo />
@@ -33,6 +41,7 @@ function App() {
         items={items}
         onDeleteItem={deleteItem}
         onCheck={checkItem}
+        onClear={clear}
       />
       <Stats items={items} />
     </div>
@@ -84,7 +93,7 @@ function Form({ onAddItem }) {
   );
 }
 
-function PackingList({ items, onDeleteItem, onCheck }) {
+function PackingList({ items, onDeleteItem, onCheck, onClear }) {
   const [sortBy, setSortBy] = useState('input');
 
   let sortedItems;
@@ -120,7 +129,7 @@ function PackingList({ items, onDeleteItem, onCheck }) {
           <option value='description'>Sort by description</option>
           <option value='status'>Sort by packed status</option>
         </select>
-        <button>Clear list</button>
+        <button onClick={onClear}>Clear list</button>
       </div>
     </div>
   );
